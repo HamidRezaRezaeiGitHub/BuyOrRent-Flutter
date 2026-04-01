@@ -1,0 +1,36 @@
+{
+  // Ensure the git-ignored reference app is still indexed and searchable in VS Code
+  "search.useIgnoreFiles": false,
+  "search.exclude": {
+    // Re-exclude heavy folders we truly don't want in search
+    "**/node_modules": true,
+    "**/.git": true,
+    "**/build": true,
+    "**/.dart_tool": true,
+    "_reference_old_react_app/node_modules": true,
+    "_reference_old_react_app/.next": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.git/objects/**": true,
+    "**/build/**": true,
+    "**/.dart_tool/**": true,
+    "_reference_old_react_app/node_modules/**": true,
+    "_reference_old_react_app/.next/**": true
+  },
+  "files.exclude": {
+    // Don't hide the reference app from the file explorer
+  },
+
+  // Dart & Flutter settings
+  "dart.flutterSdkPath": "/opt/homebrew/share/flutter",
+  "[dart]": {
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "Dart-Code.dart-code",
+    "editor.rulers": [80],
+    "editor.selectionHighlight": false,
+    "editor.suggestSelection": "first",
+    "editor.tabCompletion": "onlySnippets",
+    "editor.wordBasedSuggestions": "off"
+  }
+}
