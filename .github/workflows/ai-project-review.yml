@@ -1,0 +1,260 @@
+name: AI Project Review & Issue Creation
+
+on:
+  workflow_dispatch:
+    inputs:
+      focus_area:
+        description: "Optional: focus the review on a specific area (e.g. 'features', 'tests', 'ci'). Leave blank to review everything."
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  ai-review:
+    name: Review project and create next-steps issues
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.41.x"
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Collect project snapshot
+        id: snapshot
+        run: |
+          echo "## Project File Tree" > /tmp/project_snapshot.md
+          find lib test .github pubspec.yaml analysis_options.yaml \
+            -type f 2>/dev/null | sort >> /tmp/project_snapshot.md
+
+          echo "" >> /tmp/project_snapshot.md
+          echo "## pubspec.yaml" >> /tmp/project_snapshot.md
+          cat pubspec.yaml >> /tmp/project_snapshot.md
+
+          echo "" >> /tmp/project_snapshot.md
+          echo "## lib/ source files" >> /tmp/project_snapshot.md
+          find lib -name "*.dart" | sort | while read f; do
+            echo "### $f" >> /tmp/project_snapshot.md
+            cat "$f" >> /tmp/project_snapshot.md
+            echo "" >> /tmp/project_snapshot.md
+          done
+
+          echo "" >> /tmp/project_snapshot.md
+          echo "## test/ files" >> /tmp/project_snapshot.md
+          find test -name "*.dart" | sort | while read f; do
+            echo "### $f" >> /tmp/project_snapshot.md
+            cat "$f" >> /tmp/project_snapshot.md
+            echo "" >> /tmp/project_snapshot.md
+          done
+
+          echo "" >> /tmp/project_snapshot.md
+          echo "## .github/workflows/ files" >> /tmp/project_snapshot.md
+          find .github/workflows -name "*.yml" 2>/dev/null | sort | while read f; do
+            echo "### $f" >> /tmp/project_snapshot.md
+            cat "$f" >> /tmp/project_snapshot.md
+            echo "" >> /tmp/project_snapshot.md
+          done
+
+      - name: Create next-steps issues via GitHub Script
+        uses: actions/github-script@v7
+        env:
+          FOCUS_AREA: ${{ github.event.inputs.focus_area }}
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const focusArea = process.env.FOCUS_AREA || '';
+
+            // Read the prompt template
+            const prompt = fs.readFileSync('.github/prompts/project-review-and-issues.prompt.md', 'utf8');
+
+            // Read the project snapshot
+            const snapshot = fs.readFileSync('/tmp/project_snapshot.md', 'utf8');
+
+            // Define the next-steps issues based on the current project state
+            // (This script uses a rule-based analysis of the file tree;
+            //  replace this section with a call to your preferred AI API — e.g.
+            //  GitHub Models / OpenAI / Anthropic — if you have a token available.)
+
+            const libFiles = snapshot.match(/lib\/[^\n]+\.dart/g) || [];
+            const testFiles = snapshot.match(/test\/[^\n]+\.dart/g) || [];
+            const workflowFiles = snapshot.match(/\.github\/workflows\/[^\n]+\.yml/g) || [];
+
+            const hasFeature = (path) => libFiles.some(f => f.includes(path));
+            const hasWorkflow = (name) => workflowFiles.some(f => f.includes(name));
+
+            const issues = [];
+
+            // Features
+            if (!hasFeature('features/landing/landing_screen')) {
+              issues.push({
+                title: '[Feature] Implement landing screen',
+                body: `## Context\nThe landing screen is the first thing users see. It should include a hero headline, a brief value proposition, and a CTA button to start the questionnaire.\n\n## Acceptance Criteria\n- [ ] \`LandingScreen\` widget renders hero copy and CTA button\n- [ ] CTA navigates to the questionnaire\n- [ ] Responsive layout for mobile and desktop\n- [ ] Widget test covers CTA tap\n\n## References\n- \`_reference_old_react_app/src/pages/LandingPage\`\n- \`.github/prompts/new-feature.prompt.md\``,
+                labels: ['feature'],
+              });
+            }
+
+            if (!hasFeature('features/questionnaire')) {
+              issues.push({
+                title: '[Feature] Implement questionnaire flow',
+                body: `## Context\nThe questionnaire collects rent, purchase, and investment inputs from the user before showing results. It is the core data-entry flow of the app.\n\n## Acceptance Criteria\n- [ ] Step 1 — Rent inputs (monthly rent, rent increase rate)\n- [ ] Step 2 — Purchase inputs (price, down payment, mortgage rate, amortisation period, closing costs, property tax, maintenance)\n- [ ] Step 3 — Investment inputs (asset appreciation, investment return rate)\n- [ ] Input validation against Canada-specific min/max limits from \`shared/config/\`\n- [ ] State managed via Riverpod \`NotifierProvider\`\n- [ ] Navigation between steps via GoRouter\n- [ ] Widget tests for each step\n\n## References\n- \`_reference_old_react_app/src/pages/\`\n- \`lib/shared/config/\``,
+                labels: ['feature'],
+              });
+            }
+
+            if (!hasFeature('features/results')) {
+              issues.push({
+                title: '[Feature] Implement results dashboard',
+                body: `## Context\nThe results screen is the payoff of the app — it shows the user whether renting or buying is better for their scenario, with charts and a summary.\n\n## Acceptance Criteria\n- [ ] Summary card showing net cost of renting vs. buying over the chosen period\n- [ ] Line chart (fl_chart) of cumulative cost over time\n- [ ] Amortisation schedule table (collapsible)\n- [ ] Responsive layout — stacked on mobile, side-by-side on desktop\n- [ ] Widget tests\n\n## References\n- \`_reference_old_react_app/src/pages/ResultsPage\``,
+                labels: ['feature'],
+              });
+            }
+
+            // Calculators
+            if (!hasFeature('shared/services')) {
+              issues.push({
+                title: '[Feature] Implement mortgage amortisation calculator',
+                body: `## Context\nThe core financial engine of the app. Must match the reference React implementation exactly.\n\n## Acceptance Criteria\n- [ ] Pure function \`calculateAmortisation(inputs) → AmortisationSchedule\`\n- [ ] Computes monthly payment, principal, interest, and balance for each period\n- [ ] Handles edge cases: 0% rate, 1-month term, max values\n- [ ] Unit tests covering happy path and all edge cases\n\n## References\n- \`_reference_old_react_app/src/services/MortgageAmortizationCalculator\`\n- \`.github/instructions/financial-calculators.instructions.md\``,
+                labels: ['feature'],
+              });
+
+              issues.push({
+                title: '[Feature] Implement monthly rent projection calculator',
+                body: `## Context\nProjects rent costs over time accounting for annual rent increases. Used in the results comparison.\n\n## Acceptance Criteria\n- [ ] Pure function \`calculateRentProjection(inputs) → List<MonthlyRentEntry>\`\n- [ ] Compounds rent at the given annual increase rate\n- [ ] Edge cases: 0% increase, 1-month period\n- [ ] Unit tests\n\n## References\n- \`_reference_old_react_app/src/services/MonthlyRentCalculator\``,
+                labels: ['feature'],
+              });
+
+              issues.push({
+                title: '[Feature] Implement investment opportunity cost calculator',
+                body: `## Context\nCalculates how the down payment and monthly cost difference would grow if invested instead of used for a home purchase — essential for the rent-vs-buy comparison.\n\n## Acceptance Criteria\n- [ ] Pure function that computes investment portfolio value over time\n- [ ] Uses investment return rate from user inputs\n- [ ] Unit tests\n\n## References\n- \`_reference_old_react_app/src/services/\``,
+                labels: ['feature'],
+              });
+            }
+
+            // Models
+            if (!hasFeature('shared/models')) {
+              issues.push({
+                title: '[Architecture] Define shared data models',
+                body: `## Context\nStrongly-typed data models are needed across the questionnaire, calculators, and results. They act as the contract between UI and business logic.\n\n## Acceptance Criteria\n- [ ] \`RentInputs\` — monthly rent, rent increase rate, investment period\n- [ ] \`PurchaseInputs\` — price, down payment %, mortgage rate, amortisation years, closing costs %, property tax %, maintenance %\n- [ ] \`InvestmentInputs\` — asset appreciation %, investment return %\n- [ ] \`AmortisationSchedule\` / \`AmortisationEntry\`\n- [ ] \`ResultsSummary\`\n- [ ] All models use immutable \`copyWith\` pattern\n\n## References\n- \`_reference_old_react_app/src/\` TypeScript interfaces`,
+                labels: ['architecture'],
+              });
+            }
+
+            // Config
+            if (!hasFeature('shared/config')) {
+              issues.push({
+                title: '[Architecture] Define Canada-specific field config',
+                body: `## Context\nAll financial field limits and defaults must come from a central config — not be hardcoded in widgets or calculators.\n\n## Acceptance Criteria\n- [ ] \`lib/shared/config/field_config.dart\` defines min, max, and default for every input field\n- [ ] Values match the React reference app's config\n- [ ] Calculators and form validators import from this file\n\n## References\n- \`_reference_old_react_app/src/config/\`\n- \`.github/instructions/financial-calculators.instructions.md\` (Config Values table)`,
+                labels: ['architecture'],
+              });
+            }
+
+            // CI
+            if (!hasWorkflow('ci') && !hasWorkflow('flutter')) {
+              issues.push({
+                title: '[Chore] Add CI workflow (test + analyze on every PR)',
+                body: `## Context\nA CI pipeline catches regressions early and enforces code quality on every pull request.\n\n## Acceptance Criteria\n- [ ] \`.github/workflows/ci.yml\` triggers on \`push\` and \`pull_request\` to \`main\`\n- [ ] Runs \`flutter pub get\`, \`flutter analyze\`, and \`flutter test\`\n- [ ] Fails the PR check if any step fails\n- [ ] Caches Flutter SDK and pub dependencies for speed`,
+                labels: ['chore'],
+              });
+            }
+
+            // Theme
+            if (!hasFeature('app/theme')) {
+              // theme.dart exists but may be empty
+            } else {
+              issues.push({
+                title: '[Enhancement] Configure Material 3 theme with brand colour palette',
+                body: `## Context\n\`lib/app/theme.dart\` exists but likely uses Flutter defaults. The app needs a consistent brand identity.\n\n## Acceptance Criteria\n- [ ] Custom \`ColorScheme\` defined (seed colour matching the web app)\n- [ ] Typography scale set\n- [ ] Dark mode support\n- [ ] Theme applied in \`lib/app/app.dart\``,
+                labels: ['enhancement'],
+              });
+            }
+
+            // App icons & splash
+            issues.push({
+              title: '[Chore] Configure app icons and splash screen',
+              body: `## Context\nThe default Flutter icons and white splash screen ship with new projects. Branded assets are needed before a public release.\n\n## Acceptance Criteria\n- [ ] Add \`flutter_launcher_icons\` package and icon assets\n- [ ] Run \`flutter pub run flutter_launcher_icons\` to generate platform icons\n- [ ] Add \`flutter_native_splash\` package and configure a branded splash screen for Android and iOS`,
+              labels: ['chore'],
+            });
+
+            // Web manifest
+            issues.push({
+              title: '[Chore] Update web/manifest.json with correct app metadata',
+              body: `## Context\nThe default \`web/manifest.json\` has placeholder values. It must be updated so the PWA installs correctly.\n\n## Acceptance Criteria\n- [ ] \`name\` and \`short_name\` set to "BuyOrRent"\n- [ ] \`description\` filled in\n- [ ] Icons reference correct assets (192px and 512px)\n- [ ] \`background_color\` and \`theme_color\` match brand palette`,
+              labels: ['chore'],
+            });
+
+            // Responsive layout
+            issues.push({
+              title: '[Enhancement] Implement responsive layout breakpoints',
+              body: `## Context\nThe app targets iOS, Android, and Web. The web version especially needs an adaptive layout.\n\n## Acceptance Criteria\n- [ ] Breakpoints defined: mobile < 600, tablet < 1024, desktop >= 1024\n- [ ] Landing screen adapts (e.g. side-by-side content on desktop)\n- [ ] Results dashboard adapts (single column on mobile, multi-column on desktop)\n- [ ] \`LayoutBuilder\` / \`MediaQuery\` used (no hardcoded pixel values in widgets)`,
+              labels: ['enhancement'],
+            });
+
+            // Filter by focus area if provided
+            const filteredIssues = focusArea
+              ? issues.filter(i => i.title.toLowerCase().includes(focusArea.toLowerCase()) ||
+                                   i.body.toLowerCase().includes(focusArea.toLowerCase()))
+              : issues;
+
+            console.log(`Creating ${filteredIssues.length} issue(s)...`);
+
+            for (const issue of filteredIssues) {
+              // Check if an issue with the same title already exists
+              const existing = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                state: 'open',
+                per_page: 100,
+              });
+
+              const duplicate = existing.data.find(i => i.title === issue.title);
+              if (duplicate) {
+                console.log(`⏭  Skipping duplicate: "${issue.title}"`);
+                continue;
+              }
+
+              // Ensure labels exist
+              for (const label of issue.labels) {
+                try {
+                  await github.rest.issues.getLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: label,
+                  });
+                } catch {
+                  await github.rest.issues.createLabel({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    name: label,
+                    color: label === 'feature' ? '0075ca' :
+                           label === 'enhancement' ? 'a2eeef' :
+                           label === 'bug' ? 'd73a4a' :
+                           label === 'test' ? 'e4e669' :
+                           label === 'chore' ? 'fef2c0' :
+                           label === 'architecture' ? 'c5def5' : 'ededed',
+                  });
+                }
+              }
+
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: issue.title,
+                body: issue.body,
+                labels: issue.labels,
+              });
+              console.log(`✅ Created: "${issue.title}" → ${created.data.html_url}`);
+            }
+
+            console.log('Done.');
