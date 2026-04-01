@@ -174,7 +174,7 @@ flutter build appbundle --release
 
 1. Sign in to [developer.apple.com](https://developer.apple.com).
 2. Go to **Certificates, Identifiers & Profiles**.
-3. Create an **App ID** with bundle identifier `com.example.buyOrRent` (or your chosen ID).
+3. Create an **App ID** with bundle identifier `com.example.buyorrent` (or your chosen ID).
 4. Create a **Development Certificate** and a **Distribution Certificate**.
 5. Create a **Provisioning Profile** (App Store Distribution).
 

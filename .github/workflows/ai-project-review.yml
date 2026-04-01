@@ -170,9 +170,7 @@ jobs:
             }
 
             // Theme
-            if (!hasFeature('app/theme')) {
-              // theme.dart exists but may be empty
-            } else {
+            if (hasFeature('app/theme')) {
               issues.push({
                 title: '[Enhancement] Configure Material 3 theme with brand colour palette',
                 body: `## Context\n\`lib/app/theme.dart\` exists but likely uses Flutter defaults. The app needs a consistent brand identity.\n\n## Acceptance Criteria\n- [ ] Custom \`ColorScheme\` defined (seed colour matching the web app)\n- [ ] Typography scale set\n- [ ] Dark mode support\n- [ ] Theme applied in \`lib/app/app.dart\``,
