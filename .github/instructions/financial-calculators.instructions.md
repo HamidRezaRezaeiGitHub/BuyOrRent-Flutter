@@ -7,6 +7,7 @@ description: "Use when implementing financial calculators, mortgage amortization
 ## Reference Implementation
 
 The old React app at `_reference_old_react_app/src/services/` contains the reference calculators:
+
 - `MortgageAmortizationCalculator` — mortgage payment schedule
 - `MonthlyRentCalculator` — rent projection over time
 
@@ -23,16 +24,16 @@ Always consult these for exact formulas before implementing or modifying calcula
 
 Reference: `_reference_old_react_app/src/config/`
 
-| Field | Min | Max | Default |
-|-------|-----|-----|---------|
-| Monthly Rent | $0 | $10,000 | $2,000 |
-| Rent Increase Rate | 0% | 20% | 2.5% |
-| Purchase Price | $100K | $3M | $600K |
-| Mortgage Rate | 0% | 15% | 5.5% |
-| Mortgage Length | 1yr | 40yr | 25yr |
-| Down Payment | 0% | 100% | 20% |
-| Closing Costs | 0% | 5% | 1.5% |
-| Property Tax | 0% | 5% | 0.75% |
-| Maintenance | 0% | 10% | 1% |
-| Asset Appreciation | -5% | 20% | 3% |
-| Investment Return | -20% | 100% | 7.5% |
+| Field              | Min   | Max     | Default |
+| ------------------ | ----- | ------- | ------- |
+| Monthly Rent       | $0    | $10,000 | $2,000  |
+| Rent Increase Rate | 0%    | 20%     | 2.5%    |
+| Purchase Price     | $100K | $3M     | $600K   |
+| Mortgage Rate      | 0%    | 15%     | 5.5%    |
+| Mortgage Length    | 1yr   | 40yr    | 25yr    |
+| Down Payment       | 0%    | 100%    | 20%     |
+| Closing Costs      | 0%    | 5%      | 1.5%    |
+| Property Tax       | 0%    | 5%      | 0.75%   |
+| Maintenance        | 0%    | 10%     | 1%      |
+| Asset Appreciation | -5%   | 20%     | 3%      |
+| Investment Return  | -20%  | 100%    | 7.5%    |
