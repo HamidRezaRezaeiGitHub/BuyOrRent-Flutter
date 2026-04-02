@@ -10,35 +10,35 @@ void main() {
   group('compoundGrowth', () {
     test('period 0 returns base value unchanged', () {
       expect(
-        compoundGrowth(baseValue: 1000, periods: 0, annualRatePercent: 10),
+        compoundGrowth(baseValue: 1000, periods: 0, ratePercent: 10),
         1000.0,
       );
     });
 
     test('single period at 10%', () {
       expect(
-        compoundGrowth(baseValue: 1000, periods: 1, annualRatePercent: 10),
+        compoundGrowth(baseValue: 1000, periods: 1, ratePercent: 10),
         closeTo(1100.0, 0.001),
       );
     });
 
     test('multi-period compound: 1000 × 1.10^3 = 1331', () {
       expect(
-        compoundGrowth(baseValue: 1000, periods: 3, annualRatePercent: 10),
+        compoundGrowth(baseValue: 1000, periods: 3, ratePercent: 10),
         closeTo(1331.0, 0.001),
       );
     });
 
     test('negative rate shrinks value', () {
       expect(
-        compoundGrowth(baseValue: 1000, periods: 1, annualRatePercent: -10),
+        compoundGrowth(baseValue: 1000, periods: 1, ratePercent: -10),
         closeTo(900.0, 0.001),
       );
     });
 
     test('zero rate returns base value for any period', () {
       expect(
-        compoundGrowth(baseValue: 500, periods: 100, annualRatePercent: 0),
+        compoundGrowth(baseValue: 500, periods: 100, ratePercent: 0),
         500.0,
       );
     });
@@ -49,7 +49,7 @@ void main() {
         compoundGrowth(
           baseValue: 1000,
           periods: 2,
-          annualRatePercent: 3,
+          ratePercent: 3,
           roundMode: RoundMode.cents,
         ),
         1060.90,

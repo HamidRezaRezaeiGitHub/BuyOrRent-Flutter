@@ -13,9 +13,12 @@ applyTo: "test/**"
 
 ## Unit Tests (Calculators & Services)
 
-- Test happy paths, edge cases (0 values, max values, 1-month periods), and boundary conditions.
+- Test happy paths, edge cases (0 values, max values, single-period groups), and boundary conditions.
 - Financial calculations must match the React reference implementation outputs.
 - No mocking needed — calculators are pure functions.
+- Generic engine tests (`projection_calculator_test.dart`) must use abstract terms ("group", "period") — no domain terms like "year" or "month".
+- Domain wrapper tests (`rent_calculator_test.dart`) naturally use domain terms.
+- Test factory helpers (`constantAmount`, `compoundPerGroup`, etc.) via the engine, plus test custom `AmountForPeriod` closures directly.
 
 ## Widget Tests
 

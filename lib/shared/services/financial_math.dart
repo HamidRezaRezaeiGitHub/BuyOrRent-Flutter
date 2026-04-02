@@ -4,7 +4,7 @@ import 'round_mode.dart';
 
 /// Apply compound growth to a [baseValue] over [periods].
 ///
-/// `result = baseValue × (1 + annualRate / 100) ^ periods`
+/// `result = baseValue × (1 + rate / 100) ^ periods`
 ///
 /// This is a general-purpose formula used for:
 /// - Rent increases: `compoundGrowth(monthlyRent, yearIndex, 2.5)`
@@ -12,15 +12,17 @@ import 'round_mode.dart';
 /// - Investment returns: `compoundGrowth(principal, years, 7.5)`
 ///
 /// [periods] is 0-based: period 0 returns [baseValue] unchanged.
+/// [ratePercent] is the growth rate per period as a percentage
+/// (e.g. 2.5 = 2.5%).
 double compoundGrowth({
   required double baseValue,
   required int periods,
-  required double annualRatePercent,
+  required double ratePercent,
   RoundMode roundMode = RoundMode.none,
 }) {
   if (periods == 0) return roundMoney(baseValue, roundMode);
 
-  final result = baseValue * math.pow(1 + annualRatePercent / 100, periods);
+  final result = baseValue * math.pow(1 + ratePercent / 100, periods);
   return roundMoney(result, roundMode);
 }
 

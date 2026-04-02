@@ -50,6 +50,9 @@ lib/
 
 - **Immutable data models** — use `@freezed` or manual `copyWith` for data classes.
 - **Pure calculation functions** — financial calculators must be pure functions with no side effects or I/O. Place them in `shared/services/`.
+- **Generic projection engine** — `projectGroupedValues()` in `projection_calculator.dart` is the single generic engine for all "value over time" projections. It takes an `AmountForPeriod` callback. Domain calculators (rent, investment, etc.) are thin wrappers that supply callbacks — they never duplicate projection loops.
+- **Factory helpers for common patterns** — `constantAmount()`, `compoundPerGroup()`, `compoundPerGroupAndPeriod()` cover most cases. Write a custom `AmountForPeriod` closure only when no factory fits.
+- **Abstract naming in generic code** — generic utilities (`projection_calculator.dart`, `group_compression.dart`, `financial_math.dart`, generic models) must use abstract terms: "period", "group", "rate". Domain terms like "month", "year", "rent", "annual" belong only in domain wrappers (e.g. `rent_calculator.dart`, `mortgage_calculator.dart`). Examples in doc comments introduced with "e.g." are acceptable.
 - **Separation of concerns** — widgets should not contain business logic. Use providers/notifiers for state.
 - **Responsive layout** — use `LayoutBuilder` / `MediaQuery` to adapt for mobile vs. web. Breakpoints: mobile < 600, tablet < 1024, desktop >= 1024.
 - **Const constructors** — use `const` wherever possible for widget constructors.
