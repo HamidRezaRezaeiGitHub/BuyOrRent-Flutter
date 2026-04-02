@@ -50,26 +50,26 @@ Reference React codebase is at `_reference_old_react_app/` (git-ignored, searcha
 
 ### Android Release
 
-| Step | UAT | Production |
-|------|-----|------------|
-| 1. Create signing key | `keytool -genkey -v -keystore uat.keystore ...` | `keytool -genkey -v -keystore prod.keystore ...` |
-| 2. Configure signing | Add keystore to `android/key.properties` | Same, with prod keystore |
-| 3. Build | `flutter build apk --flavor uat` | `flutter build appbundle --flavor prod` |
-| 4. Distribute | Upload APK to Firebase App Distribution or share directly | Upload AAB to Google Play Console |
-| 5. Testing track | Internal testing track on Play Console | Production track on Play Console |
+| Step                  | UAT                                                       | Production                                       |
+| --------------------- | --------------------------------------------------------- | ------------------------------------------------ |
+| 1. Create signing key | `keytool -genkey -v -keystore uat.keystore ...`           | `keytool -genkey -v -keystore prod.keystore ...` |
+| 2. Configure signing  | Add keystore to `android/key.properties`                  | Same, with prod keystore                         |
+| 3. Build              | `flutter build apk --flavor uat`                          | `flutter build appbundle --flavor prod`          |
+| 4. Distribute         | Upload APK to Firebase App Distribution or share directly | Upload AAB to Google Play Console                |
+| 5. Testing track      | Internal testing track on Play Console                    | Production track on Play Console                 |
 
 **Flavor setup:** Create `android/app/src/uat/` and `android/app/src/prod/` with per-environment configs (API keys, app name, bundle ID suffix).
 
 ### iOS Release
 
-| Step | UAT (TestFlight) | Production (App Store) |
-|------|-------------------|----------------------|
-| 1. Certificates | Create Development + Distribution certs in Apple Developer portal | Same |
-| 2. App ID | Register `com.buyorrent.buyOrRent.uat` | Register `com.buyorrent.buyOrRent` |
-| 3. Provisioning | Create Ad Hoc provisioning profile | Create App Store provisioning profile |
-| 4. Build | `flutter build ipa --flavor uat --export-method ad-hoc` | `flutter build ipa --flavor prod --export-method app-store` |
-| 5. Upload | Open `build/ios/ipa/*.ipa` in Transporter → upload to App Store Connect | Same |
-| 6. Distribute | App Store Connect → TestFlight → add testers | App Store Connect → submit for App Review |
+| Step            | UAT (TestFlight)                                                        | Production (App Store)                                      |
+| --------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------- |
+| 1. Certificates | Create Development + Distribution certs in Apple Developer portal       | Same                                                        |
+| 2. App ID       | Register `com.buyorrent.buyOrRent.uat`                                  | Register `com.buyorrent.buyOrRent`                          |
+| 3. Provisioning | Create Ad Hoc provisioning profile                                      | Create App Store provisioning profile                       |
+| 4. Build        | `flutter build ipa --flavor uat --export-method ad-hoc`                 | `flutter build ipa --flavor prod --export-method app-store` |
+| 5. Upload       | Open `build/ios/ipa/*.ipa` in Transporter → upload to App Store Connect | Same                                                        |
+| 6. Distribute   | App Store Connect → TestFlight → add testers                            | App Store Connect → submit for App Review                   |
 
 ### Web Release
 
@@ -88,7 +88,7 @@ flutter build web                           # Build static site
 2. Search for **"BuyOrRent"**
 3. Tap **Install**
 
-*For UAT testers:* You'll receive an email invite to join the testing program. Follow the link to install the test version.
+_For UAT testers:_ You'll receive an email invite to join the testing program. Follow the link to install the test version.
 
 ### iOS
 
@@ -96,9 +96,8 @@ flutter build web                           # Build static site
 2. Search for **"BuyOrRent"**
 3. Tap **Get** → authenticate with Face ID / Touch ID
 
-*For UAT testers:* You'll receive a TestFlight invite via email. Install the **TestFlight** app first, then open the invite link to install the test version.
+_For UAT testers:_ You'll receive a TestFlight invite via email. Install the **TestFlight** app first, then open the invite link to install the test version.
 
 ### Web
 
 Visit the hosted URL in any browser (link TBD after deployment).
-

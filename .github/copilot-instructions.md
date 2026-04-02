@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-BuyOrRent is a **financial decision-support app** that helps Canadians compare renting vs. buying a home. It is a Flutter rewrite of an existing React web app. The old React codebase is available at `_reference_old_react_app/` for reference — consult it for business logic, feature specs, and UI patterns when needed.
+BuyOrRent is a **financial decision-support app** that helps Canadians compare renting vs. buying a home. It is a Flutter rewrite of an existing (in-development) React web app. The old React codebase is available at `_reference_old_react_app/` for reference — consult it for business logic, feature specs, and UI patterns when needed.
 
 ### Target Platforms
 
@@ -14,15 +14,15 @@ All three platforms must be considered for every feature. Use platform-adaptive 
 
 ## Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| Framework | Flutter 3.41.x (stable) / Dart 3.11.x |
-| State Management | Riverpod (flutter_riverpod + riverpod_annotation) |
-| Routing | GoRouter (go_router) |
-| Forms & Validation | reactive_forms or manual with Dart |
-| Charting | fl_chart |
-| Theming | Material 3 with custom color scheme |
-| Testing | flutter_test + mocktail |
+| Layer              | Technology                                        |
+| ------------------ | ------------------------------------------------- |
+| Framework          | Flutter 3.41.x (stable) / Dart 3.11.x             |
+| State Management   | Riverpod (flutter_riverpod + riverpod_annotation) |
+| Routing            | GoRouter (go_router)                              |
+| Forms & Validation | reactive_forms or manual with Dart                |
+| Charting           | fl_chart                                          |
+| Theming            | Material 3 with custom color scheme               |
+| Testing            | flutter_test + mocktail                           |
 
 ## Architecture
 
@@ -73,16 +73,17 @@ lib/
 ## Build & Run
 
 ```bash
-flutter run -d chrome         # Web
-flutter run -d <ios_device>   # iOS (requires Xcode)
-flutter run -d <android_device>  # Android (requires Android SDK)
-flutter test                  # Run all tests
-flutter analyze               # Lint check
+flutter run -d chrome             # Web
+flutter run -d <ios_device>       # iOS (requires Xcode)
+flutter run -d <android_device>   # Android (requires Android SDK)
+flutter test                      # Run all tests
+flutter analyze                   # Lint check
 ```
 
 ## Reference App
 
 The old React codebase at `_reference_old_react_app/` contains:
+
 - **Business logic** in `src/services/` — mortgage amortization, rent projection calculators
 - **Config values** in `src/config/` — Canada-specific min/max/default values for all fields
 - **UI flow** in `src/pages/` and `src/components/` — questionnaire steps, results panels
